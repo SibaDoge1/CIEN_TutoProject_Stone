@@ -5,6 +5,13 @@ using UnityEngine;
 public class Stone : MonoBehaviour
 {
     public bool isMoving;
+    public enum paleteKey {
+        red, blue, green, white
+    };
+    public static Dictionary<paleteKey, Color> palete = new Dictionary<paleteKey, Color> {
+        {paleteKey.red, Color.red }, {paleteKey.blue, Color.blue }, {paleteKey.green, Color.green}, {paleteKey.white, Color.white }
+    };
+    public paleteKey _color;
     public Vector2 mapPos;
     private SpriteRenderer sprite;
     private GameManager GM;
@@ -20,6 +27,8 @@ public class Stone : MonoBehaviour
         GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
         mp = GameObject.Find("Main Camera").GetComponent<Map>();
         sprite = transform.GetComponent<SpriteRenderer>();
+        changeAppear(_color);
+        sprite.material = Resources.Load("Materials&Shaders/New Material") as Material;
         isMoving = true;
     }
 
@@ -114,7 +123,7 @@ public class Stone : MonoBehaviour
             tempVec = mapPos + mp.rotate(Vector2.up, (-90f) * i);
             if (!mp.isInside(tempVec) || mp.map[(int)tempVec.x, (int)tempVec.y] == null) continue;
             tempStone = mp.map[(int)tempVec.x, (int)tempVec.y].GetComponent<Stone>();
-            if (!tempStone.isMoving && tempStone.sprite.color == sprite.color && !GM.matchQueue.Contains(tempStone))
+            if (!tempStone.isMoving && tempStone._color == _color && !GM.matchQueue.Contains(tempStone))
             {
                 tempStone.checkMatch();
             }
@@ -122,16 +131,16 @@ public class Stone : MonoBehaviour
         return;
     }
 
-    public void changeAppear(Color col)
+    public void changeAppear(paleteKey col)
     {
-        sprite.color = col;
+        _color = col;
+        sprite.color = palete[col];
     }
 
 
     public void destroy()
     {
-        GM.stopMoves -= stopMove;
-        changeAppear(Color.red);
+        changeAppear(paleteKey.red);
         Destroy(gameObject, 0.5f);
     }
 

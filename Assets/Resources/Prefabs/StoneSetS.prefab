@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  _color: 3
   mapPos: {x: 0, y: 0}
 --- !u!114 &114086377037102918
 MonoBehaviour:
@@ -200,6 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  _color: 2
   mapPos: {x: 0, y: 0}
 --- !u!114 &114633715260732514
 MonoBehaviour:
@@ -213,6 +215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  _color: 1
   mapPos: {x: 0, y: 0}
 --- !u!114 &114658747412129650
 MonoBehaviour:
@@ -226,6 +229,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMoving: 0
+  _color: 3
   mapPos: {x: 0, y: 0}
 --- !u!212 &212374004304386186
 SpriteRenderer:

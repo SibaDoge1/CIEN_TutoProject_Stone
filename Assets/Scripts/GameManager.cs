@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
             spawnQueue.Enqueue(str);
         }
         spawnNext();
+        StartCoroutine("checkRoutine");
     }
 	
 	// Update is called once per frame
@@ -56,9 +57,7 @@ public class GameManager : MonoBehaviour
 
     public void doNext()
     {
-        StaticCoroutine.func funcs = checkMatchs;
-        funcs += spawnNext;
-        StaticCoroutine.DoCoroutine(funcs, 0.5f);
+        StaticCoroutine.DoCoroutine(spawnNext, 0.5f);
     }
 
     public void clicked(string str) {
@@ -71,6 +70,7 @@ public class GameManager : MonoBehaviour
     {
         isSuccess = true;
         stopMoves();
+        StopCoroutine("checkRoutine");
         for (int y = 12; y < mp.Height; y++)
         {
             for (int x = 0; x < mp.Width; x++)
@@ -102,5 +102,15 @@ public class GameManager : MonoBehaviour
                 matchQueue.Clear();
             }
         }
+    }
+
+    IEnumerator checkRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.5f);
+            checkMatchs();
+        }
+
     }
 }
