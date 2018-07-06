@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void awake()
     {
-        Screen.SetResolution(Screen.width, Screen.width * (16 / 9),true);
+        Screen.SetResolution(Screen.width, Screen.width * 16 / 9, true);
     }
     void Start ()
     {
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
         }
         spawnNext();
         StartCoroutine("checkRoutine");
+
     }
 	
 	// Update is called once per frame
