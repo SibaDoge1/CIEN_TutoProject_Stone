@@ -17,9 +17,10 @@ public class GameManager : MonoBehaviour
     private bool isSuccess = false;
     private Map mp;
     // Use this for initialization
-    void awake()
+    void awake ()
     {
-        Screen.SetResolution(Screen.width, Screen.width * 16 / 9, true);
+
+
     }
     void Start ()
     {

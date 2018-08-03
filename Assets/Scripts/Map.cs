@@ -13,6 +13,7 @@ public class Map : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        GetComponent<Camera>().aspect = 9f/16f;
         map = new GameObject[Width, Height];
         txt = GameObject.Find("Text (1)").GetComponent<Text>();
     }
