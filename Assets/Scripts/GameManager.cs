@@ -10,33 +10,48 @@ public class GameManager : MonoBehaviour
     public float spawnPointY;
     public float fallDelay;
     public string[] spawnArray;
+    public int stageNum;
     public Queue<string> spawnQueue = new Queue<string> { };
     public List<Stone> matchQueue = new List<Stone>{ };
     public StaticCoroutine.func stopMoves;
     private GameObject stoneSet;
     private bool isSuccess = false;
     private Map mp;
+    private GameObject win;
+    private GameObject loose;
     // Use this for initialization
     void awake ()
     {
-
+        
 
     }
     void Start ()
     {
+        win = GameObject.Find("Canvas").transform.Find("Win").gameObject;
+        loose = GameObject.Find("Canvas").transform.Find("Loose").gameObject;
         stopMoves = () => { };
         mp = gameObject.GetComponent<Map>();
-        foreach (string str in spawnArray)
-        {
-            spawnQueue.Enqueue(str);
-        }
-        spawnNext();
-        StartCoroutine("checkRoutine");
 
     }
 	
 	// Update is called once per frame
 	void Update ()
+    {
+
+    }
+
+    public void startGame()
+    {
+        foreach (KeyValuePair<string, string> dic in StageData.Instance.stageData[stageNum.ToString()])
+        {
+            if (!dic.Value.Equals("-1") && !dic.Value.Equals("")) spawnQueue.Enqueue(dic.Value);
+        }
+        Debug.Log(spawnQueue.Count);
+        spawnNext();
+        StartCoroutine("checkRoutine");
+    }
+
+    public void spawnNext()
     {
         for (int i = 0; i < mp.Width; i++)
         {
@@ -45,17 +60,28 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log("GAME OVER");
                 success(i);
+                return;
             }
+        }
+        if (spawnQueue.Count == 0 && !isSuccess)
+        {
+            Loose();
+            return;
+        }
+        string block = spawnQueue.Dequeue();
+        string name = block.Substring(0, 1);
+        string colors = block.Substring(2);
+        GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
+        stoneSet = Instantiate(prefab, new Vector3(spawnPointX, spawnPointY, 2), Quaternion.identity);
+        for (int i = 0; i < prefab.transform.childCount; i++)
+        {
+            stoneSet.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);
         }
     }
 
-    public void spawnNext()
+    public void Loose()
     {
-
-        if (spawnQueue.Count == 0 || isSuccess) return;
-        string next = spawnQueue.Dequeue();
-        GameObject prefab = Resources.Load("Prefabs/StoneSet" + next) as GameObject;
-        stoneSet = Instantiate(prefab, new Vector3(spawnPointX, spawnPointY, 0), Quaternion.identity);
+        loose.SetActive(true);
     }
 
     public void doNext()
@@ -72,6 +98,7 @@ public class GameManager : MonoBehaviour
     public void success(int successX)
     {
         isSuccess = true;
+        win.SetActive(true);
         stopMoves();
         StopCoroutine("checkRoutine");
         for (int y = 12; y < mp.Height; y++)

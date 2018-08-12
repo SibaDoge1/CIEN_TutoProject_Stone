@@ -4,14 +4,9 @@ using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
+
     public bool isMoving;
-    public enum paleteKey {
-        red, blue, green, white
-    };
-    public static Dictionary<paleteKey, Color> palete = new Dictionary<paleteKey, Color> {
-        {paleteKey.red, Color.red }, {paleteKey.blue, Color.blue }, {paleteKey.green, Color.green}, {paleteKey.white, Color.white }
-    };
-    public paleteKey _color;
+    private StageData.paleteKey _color;
     public Vector2 mapPos;
     private SpriteRenderer sprite;
     private GameManager GM;
@@ -20,16 +15,15 @@ public class Stone : MonoBehaviour
 
     void Awake()
     {
+        GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
+        mp = GameObject.Find("Main Camera").GetComponent<Map>();
+        sprite = transform.GetComponent<SpriteRenderer>();
+        isMoving = true;
     }
 
     void Start()
     {
-        GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
-        mp = GameObject.Find("Main Camera").GetComponent<Map>();
-        sprite = transform.GetComponent<SpriteRenderer>();
-        changeAppear(_color);
-        sprite.material = Resources.Load("Materials&Shaders/New Material") as Material;
-        isMoving = true;
+
     }
 
     // Update is called once per frame
@@ -131,16 +125,27 @@ public class Stone : MonoBehaviour
         return;
     }
 
-    public void changeAppear(paleteKey col)
+    public void changeAppear(StageData.paleteKey col)
     {
         _color = col;
-        sprite.color = palete[col];
+        sprite.color = StageData.palete[col];
+    }
+
+    public void changeAppear(char col)
+    {
+        switch (col)
+        {
+           case 'r': _color = StageData.paleteKey.r; break;
+           case 'b': _color = StageData.paleteKey.b; break;
+           case 'y': _color = StageData.paleteKey.y; break;
+        }
+        sprite.color = StageData.palete[_color];
     }
 
 
     public void destroy()
     {
-        changeAppear(paleteKey.red);
+        changeAppear(StageData.paleteKey.r);
         Destroy(gameObject, 0.5f);
     }
 
