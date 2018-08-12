@@ -263,7 +263,7 @@ RectTransform:
   m_LocalScale: {x: 1.0000149, y: 1.0000149, z: 1.0000149}
   m_Children: []
   m_Father: {fileID: 1783288792}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -742,7 +742,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8.3
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -791,6 +791,7 @@ MonoBehaviour:
   - 'I_yryb '
   - 'I_ybry '
   stageNum: 0
+  maxMatchCount: 4
   matchQueue: []
 --- !u!114 &438836258
 MonoBehaviour:
@@ -1059,7 +1060,7 @@ RectTransform:
   - {fileID: 108513551}
   - {fileID: 1359444530}
   m_Father: {fileID: 1783288792}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2582,8 +2583,8 @@ RectTransform:
   - {fileID: 1858796139}
   - {fileID: 1382431446}
   - {fileID: 1648295820}
-  - {fileID: 54725253}
   - {fileID: 765647718}
+  - {fileID: 54725253}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

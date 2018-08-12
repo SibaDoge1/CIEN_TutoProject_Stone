@@ -20,6 +20,7 @@ public class StoneSet : MonoBehaviour
         mp = GameObject.Find("Main Camera").GetComponent<Map>();
         GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
         updateMap();
+        posRoundSet();
         StartCoroutine("fall");
     }
 
@@ -41,11 +42,18 @@ public class StoneSet : MonoBehaviour
             case "right": Move("right"); break;
             case "down": Move("down"); break;
             case "up":
-                transform.Rotate(0, 0, -90);
+                if (gameObject.CompareTag("Ostone"))
+                    transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, -90f);
+                else
+                    transform.Rotate(0, 0, -90);
                 if (isValidPosSet())
                     updateMap();
                 else
+                {
+                    if (gameObject.CompareTag("Ostone"))
+                        transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, 90f);
                     transform.Rotate(0, 0, 90);
+                }
                 break;
         }
     }
@@ -54,7 +62,7 @@ public class StoneSet : MonoBehaviour
     {
         foreach (Transform child in children)
         {
-            if (child.gameObject == gameObject)
+            if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
             if (!(child.gameObject.GetComponent<Stone>().isValidPos()))
                 return false; 
@@ -65,7 +73,7 @@ public class StoneSet : MonoBehaviour
     {
         foreach (Transform child in children)
         {
-            if (child.gameObject == gameObject)
+            if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
             if ((child.gameObject.GetComponent<Stone>().isStucked()))
                 return true;
@@ -101,7 +109,7 @@ public class StoneSet : MonoBehaviour
         transform.position = origin;
         foreach (Transform child in children)
         {
-            if (child.gameObject == gameObject)
+            if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
             child.gameObject.GetComponent<Stone>().posRound();
         }
@@ -111,7 +119,7 @@ public class StoneSet : MonoBehaviour
     {
         foreach (Transform child in children)
         {
-            if (child.gameObject == gameObject)
+            if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
             mp.updateStone(child.gameObject);
         }
@@ -122,7 +130,7 @@ public class StoneSet : MonoBehaviour
         StopCoroutine("fall");
         foreach (Transform child in children)
         {
-            if (child.gameObject == gameObject)
+            if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
             child.gameObject.GetComponent<Stone>().startMove();
             child.parent = null;

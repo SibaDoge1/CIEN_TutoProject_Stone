@@ -145,7 +145,7 @@ public class Stone : MonoBehaviour
 
     public void destroy()
     {
-        changeAppear(StageData.paleteKey.r);
+        changeAppear(StageData.paleteKey.w);
         Destroy(gameObject, 0.5f);
     }
 
