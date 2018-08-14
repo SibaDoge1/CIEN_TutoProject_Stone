@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public float fallDelay;
     public string[] spawnArray;
     public int stageNum;
+    public int maxMatchCount;
     public Queue<string> spawnQueue = new Queue<string> { };
     public List<Stone> matchQueue = new List<Stone>{ };
     public StaticCoroutine.func stopMoves;
@@ -73,7 +74,7 @@ public class GameManager : MonoBehaviour
         string colors = block.Substring(2);
         GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
         stoneSet = Instantiate(prefab, new Vector3(spawnPointX, spawnPointY, 2), Quaternion.identity);
-        for (int i = 0; i < prefab.transform.childCount; i++)
+        for (int i = 0; i < colors.Length; i++)
         {
             stoneSet.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);
         }
@@ -122,7 +123,7 @@ public class GameManager : MonoBehaviour
                 if (mp.map[x, y] == null) continue;
                 else if (mp.map[x, y].GetComponent<Stone>().isMoving) continue;
                 mp.map[x, y].GetComponent<Stone>().checkMatch();
-                if (matchQueue.Count >= 5)
+                if (matchQueue.Count >= maxMatchCount)
                 {
                     foreach (Stone stone in matchQueue)
                     {
