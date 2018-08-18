@@ -6,7 +6,7 @@ public class Stone : MonoBehaviour
 {
 
     public bool isMoving;
-    private StageData.paleteKey _color;
+    private char _color;
     public Vector2 mapPos;
     private SpriteRenderer sprite;
     private GameManager GM;
@@ -125,27 +125,17 @@ public class Stone : MonoBehaviour
         return;
     }
 
-    public void changeAppear(StageData.paleteKey col)
-    {
-        _color = col;
-        sprite.color = StageData.palete[col];
-    }
-
     public void changeAppear(char col)
     {
-        switch (col)
-        {
-           case 'r': _color = StageData.paleteKey.r; break;
-           case 'b': _color = StageData.paleteKey.b; break;
-           case 'y': _color = StageData.paleteKey.y; break;
-        }
-        sprite.color = StageData.palete[_color];
+        _color = col;
+        sprite.sprite = Resources.Load<Sprite>("Images/Stone_" + col) as Sprite;
     }
 
 
     public void destroy()
     {
-        changeAppear(StageData.paleteKey.w);
+        changeAppear('g');
+        mp.deleteStone(gameObject);
         Destroy(gameObject, 0.5f);
     }
 

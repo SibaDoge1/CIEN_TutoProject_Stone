@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
     public float spawnPointX;
     public float spawnPointY;
     public float fallDelay;
-    public string[] spawnArray;
+    public float visualPointX;
+    public float visualPointY;
     public int stageNum;
     public int maxMatchCount;
     public Queue<string> spawnQueue = new Queue<string> { };
@@ -20,36 +21,56 @@ public class GameManager : MonoBehaviour
     private Map mp;
     private GameObject win;
     private GameObject loose;
+    public GameObject alpaca;
+    private bool camMove;
+    private GameObject UI;
+    private string next;
+    private GameObject nextStone1;
+    private GameObject nextStone2;
     // Use this for initialization
-    void awake ()
+    void OnEnable ()
     {
-        
-
-    }
-    void Start ()
-    {
-        win = GameObject.Find("Canvas").transform.Find("Win").gameObject;
-        loose = GameObject.Find("Canvas").transform.Find("Loose").gameObject;
-        stopMoves = () => { };
-        mp = gameObject.GetComponent<Map>();
-
-    }
-	
-	// Update is called once per frame
-	void Update ()
-    {
-
-    }
-
-    public void startGame()
-    {
+        SoundManager.get("main").Play();
         foreach (KeyValuePair<string, string> dic in StageData.Instance.stageData[stageNum.ToString()])
         {
             if (!dic.Value.Equals("-1") && !dic.Value.Equals("")) spawnQueue.Enqueue(dic.Value);
         }
-        Debug.Log(spawnQueue.Count);
+        Debug.Log(stageNum+"스테이지임");
+        stopMoves = () => { };
+        if(spawnQueue.Count != 0)
+            next = spawnQueue.Dequeue();
         spawnNext();
         StartCoroutine("checkRoutine");
+        camMove = false;
+    }
+    void Awake ()
+    {
+        win = GameObject.Find("Canvas").transform.Find("Win").gameObject;
+        loose = GameObject.Find("Canvas").transform.Find("Loose").gameObject;
+        mp = gameObject.GetComponent<Map>();
+        UI = GameObject.Find("Canvas").transform.Find("UI").gameObject;
+
+    }
+	
+	// Update is called once per frame
+	void FixedUpdate ()
+    {
+        if (camMove)
+        {
+            if (gameObject.transform.position.y < 7.5f)
+                gameObject.transform.Translate(Vector3.up * Time.fixedDeltaTime * (2.5f / 0.8f));
+            else
+            {
+                camMove = false;
+                alpaca.SetActive(true);
+            }
+        }
+        
+    }
+
+    public void startGame()
+    {
+
     }
 
     public void spawnNext()
@@ -60,16 +81,21 @@ public class GameManager : MonoBehaviour
             else if (!mp.map[i, mp.successH].GetComponent<Stone>().isMoving)
             {
                 Debug.Log("GAME OVER");
-                success(i);
+                success(mp.map[i, 0].transform.position);
                 return;
             }
         }
-        if (spawnQueue.Count == 0 && !isSuccess)
+        if (spawnQueue.Count == 0 && next == null &&!isSuccess)
         {
             Loose();
             return;
         }
-        string block = spawnQueue.Dequeue();
+        string block = next;
+        if(spawnQueue.Count != 0)
+            next = spawnQueue.Dequeue();
+        else
+            next = null;
+        visualNext();
         string name = block.Substring(0, 1);
         string colors = block.Substring(2);
         GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
@@ -80,9 +106,49 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void visualNext()
+    {
+        Destroy(nextStone1);
+        Destroy(nextStone2);
+        if (next == null)
+        {
+            GameObject.Find("Remain").GetComponent<Text>().text = "남은 돌 : " + (spawnQueue.Count);
+            return;
+        }
+        else GameObject.Find("Remain") .GetComponent<Text>().text = "남은 돌 : " + (spawnQueue.Count + 1);
+        string name = next.Substring(0, 1);
+        string colors = next.Substring(2);
+        GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
+        nextStone1 = Instantiate(prefab, new Vector3(visualPointX, visualPointY, -1), Quaternion.identity);
+        nextStone1.transform.localScale = Vector3.one * 0.5f;
+        for (int i = 0; i < colors.Length; i++)
+        {
+            nextStone1.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);
+            Destroy(nextStone1.transform.GetChild(i).GetComponent<Stone>());
+        }
+        Destroy(nextStone1.GetComponent<StoneSet>());
+        if (spawnQueue.Count != 0)
+        {
+            name = spawnQueue.Peek().Substring(0, 1);
+            colors = spawnQueue.Peek().Substring(2);
+            prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
+            nextStone2 = Instantiate(prefab, new Vector3(visualPointX + 2.5f, visualPointY, -1), Quaternion.identity);
+            nextStone2.transform.localScale = Vector3.one * 0.5f;
+            for (int i = 0; i < colors.Length; i++)
+            {
+                nextStone2.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);
+                Destroy(nextStone2.transform.GetChild(i).GetComponent<Stone>());
+            }
+            Destroy(nextStone2.GetComponent<StoneSet>());
+        }
+    }
+
     public void Loose()
     {
         loose.SetActive(true);
+        SoundManager.get("main").Stop();
+        SoundManager.get("Stage fail").Play();
+        StopCoroutine("checkRoutine");
     }
 
     public void doNext()
@@ -91,29 +157,27 @@ public class GameManager : MonoBehaviour
     }
 
     public void clicked(string str) {
+        SoundManager.get("touch").Play();
         if (stoneSet == null) return;
         Debug.Log("clicked");
         stoneSet.GetComponent<StoneSet>().clicked(str);
     }
 
-    public void success(int successX)
+    public void success(Vector3 successPos)
     {
         isSuccess = true;
-        win.SetActive(true);
+        SoundManager.get("main").Stop();
+        SoundManager.get("Stage win").Play();
+        Destroy(nextStone1);
+        Destroy(nextStone2);
         stopMoves();
         StopCoroutine("checkRoutine");
-        for (int y = 12; y < mp.Height; y++)
-        {
-            for (int x = 0; x < mp.Width; x++)
-            {
-                if (mp.map[x, y] != null)
-                {
-                    mp.map[x, y].GetComponent<Stone>().destroy();
-                    mp.map[x, y] = null;
-                }
-            }
-        }
+        camMove = true;
+        alpaca.GetComponent<MainCharacter>().successPos = successPos;
+        UI.SetActive(false);
     }
+
+
 
     public void checkMatchs() {
         for (int y = 0; y < mp.successH; y++)
@@ -133,6 +197,30 @@ public class GameManager : MonoBehaviour
                 matchQueue.Clear();
             }
         }
+    }
+
+    public void stageReset()
+    {
+        for (int y = 0; y < mp.Height; ++y)
+            for (int x = 0; x < mp.Width; ++x)
+                if (mp.map[x, y] != null)
+                {
+                    Destroy(mp.map[x, y]);
+                    mp.map[x, y] = null;
+                }
+        SoundManager.get("main").Stop();
+        Destroy(stoneSet);
+        spawnQueue.Clear();
+        Destroy(nextStone1);
+        Destroy(nextStone2);
+        isSuccess = false;
+        matchQueue.Clear();
+        stopMoves = () => { };
+        transform.position = new Vector3(transform.position.x, 5f, transform.position.z);
+        alpaca.GetComponent<MainCharacter>().reset();
+        UI.SetActive(true);
+        UI.transform.Find("Remain").GetComponent<Text>().text = "남은 돌 : ";
+        this.enabled = false;
     }
 
     IEnumerator checkRoutine()
