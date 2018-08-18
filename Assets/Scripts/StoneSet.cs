@@ -42,17 +42,51 @@ public class StoneSet : MonoBehaviour
             case "right": Move("right"); break;
             case "down": Move("down"); break;
             case "up":
+
                 if (gameObject.CompareTag("Ostone"))
                     transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, -90f);
+                else if (gameObject.CompareTag("Istone"))
+                {
+                    transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, -90f);
+                    Debug.Log(transform.eulerAngles.z+"이다");
+                    if (transform.eulerAngles.z % 180 == 90)
+                    {
+                        Debug.Log("90임");
+                        transform.Translate(0.5f, -0.5f, 0, Space.World);
+                    }
+                    if (transform.eulerAngles.z % 180 == 0)
+                    {
+                        Debug.Log("0임");
+                        transform.Translate(-0.5f, 0.5f, 0, Space.World);
+                    }
+                }
                 else
                     transform.Rotate(0, 0, -90);
                 if (isValidPosSet())
+                {
                     updateMap();
+                    foreach (Transform child in children)
+                    {
+                        if (child.gameObject == gameObject || !child.CompareTag("Stone"))
+                            continue;
+                        child.Rotate(0, 0, 90f);
+                    }
+                }
                 else
                 {
                     if (gameObject.CompareTag("Ostone"))
                         transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, 90f);
-                    transform.Rotate(0, 0, 90);
+                    else if (gameObject.CompareTag("Istone"))
+                    {
+                        if (transform.eulerAngles.z % 180 == 90)
+                            transform.Translate(-0.5f, 0.5f, 0, Space.World);
+                        if (transform.eulerAngles.z % 180 == 0)
+                            transform.Translate(0.5f, -0.5f, 0, Space.World);
+                        transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, 90f);
+
+                    }
+                    else
+                        transform.Rotate(0, 0, 90);
                 }
                 break;
         }
