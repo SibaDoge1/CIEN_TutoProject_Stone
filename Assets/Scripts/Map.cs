@@ -15,7 +15,6 @@ public class Map : MonoBehaviour
     {
         map = new GameObject[Width, Height];
     }
-
     // Update is called once per frame
     void Update()
     {

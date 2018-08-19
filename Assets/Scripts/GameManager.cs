@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     private string next;
     private GameObject nextStone1;
     private GameObject nextStone2;
+    private GameObject nextPanel;
     // Use this for initialization
     void OnEnable ()
     {
@@ -49,6 +50,7 @@ public class GameManager : MonoBehaviour
         loose = GameObject.Find("Canvas").transform.Find("Loose").gameObject;
         mp = gameObject.GetComponent<Map>();
         UI = GameObject.Find("Canvas").transform.Find("UI").gameObject;
+        nextPanel = GameObject.Find("NextPanel").gameObject;
 
     }
 	
@@ -175,6 +177,7 @@ public class GameManager : MonoBehaviour
         camMove = true;
         alpaca.GetComponent<MainCharacter>().successPos = successPos;
         UI.SetActive(false);
+        nextPanel.SetActive(false);
     }
 
 
@@ -219,6 +222,7 @@ public class GameManager : MonoBehaviour
         transform.position = new Vector3(transform.position.x, 5.5f, transform.position.z);
         alpaca.GetComponent<MainCharacter>().reset();
         UI.SetActive(true);
+        nextPanel.SetActive(true);
         UI.transform.Find("Remain").GetComponent<Text>().text = "남은 돌 : ";
         this.enabled = false;
     }
