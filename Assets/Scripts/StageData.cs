@@ -26,6 +26,9 @@ public class StageData : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Screen.SetResolution(Screen.width, Screen.width * (9 / 16), true);
+
+        GetComponent<Camera>().aspect = 9f / 16f;
 
     }
     public static StageData Instance
