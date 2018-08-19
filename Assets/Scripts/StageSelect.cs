@@ -42,9 +42,7 @@ public class StageSelect : MonoBehaviour {
         SoundManager.get("touch").Play();
         SoundManager.get("main start").Stop();
         GM.stageNum = stageNum;
-        GM.enabled = true;
-        GM.startGame();
-
+        GameObject.Find("Canvas").transform.Find("StartPanel").gameObject.SetActive(true);
         gameObject.SetActive(false);
 
     }

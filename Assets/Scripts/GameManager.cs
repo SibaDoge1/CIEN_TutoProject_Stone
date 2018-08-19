@@ -120,7 +120,7 @@ public class GameManager : MonoBehaviour
         string colors = next.Substring(2);
         GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
         nextStone1 = Instantiate(prefab, new Vector3(visualPointX, visualPointY, -1), Quaternion.identity);
-        nextStone1.transform.localScale = Vector3.one * 0.5f;
+        nextStone1.transform.localScale = Vector3.one * 0.58f;
         for (int i = 0; i < colors.Length; i++)
         {
             nextStone1.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);
@@ -132,8 +132,8 @@ public class GameManager : MonoBehaviour
             name = spawnQueue.Peek().Substring(0, 1);
             colors = spawnQueue.Peek().Substring(2);
             prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
-            nextStone2 = Instantiate(prefab, new Vector3(visualPointX + 2.5f, visualPointY, -1), Quaternion.identity);
-            nextStone2.transform.localScale = Vector3.one * 0.5f;
+            nextStone2 = Instantiate(prefab, new Vector3(visualPointX + 2.7f, visualPointY, -1), Quaternion.identity);
+            nextStone2.transform.localScale = Vector3.one * 0.58f;
             for (int i = 0; i < colors.Length; i++)
             {
                 nextStone2.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);
@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
         isSuccess = false;
         matchQueue.Clear();
         stopMoves = () => { };
-        transform.position = new Vector3(transform.position.x, 5f, transform.position.z);
+        transform.position = new Vector3(transform.position.x, 5.5f, transform.position.z);
         alpaca.GetComponent<MainCharacter>().reset();
         UI.SetActive(true);
         UI.transform.Find("Remain").GetComponent<Text>().text = "남은 돌 : ";

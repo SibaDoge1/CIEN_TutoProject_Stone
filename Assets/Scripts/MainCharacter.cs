@@ -40,7 +40,7 @@ public class MainCharacter : MonoBehaviour {
             {
                 isMoving = false;
                 transform.GetComponent<SpriteRenderer>().sprite = alpacaJ;
-                win.SetActive(true);
+                Invoke("winPanel", 0.5f);
             }
             moveTime += Time.deltaTime;
             if (transform.position == targetPos)
@@ -63,5 +63,10 @@ public class MainCharacter : MonoBehaviour {
         transform.GetComponent<SpriteRenderer>().sprite = alpacaS;
         isMoving = true;
         gameObject.SetActive(false);
+    }
+
+    public void winPanel()
+    {
+        win.SetActive(true);
     }
 }

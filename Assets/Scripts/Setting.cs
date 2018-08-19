@@ -34,21 +34,24 @@ public class Setting : MonoBehaviour {
                 GM.stageReset();
                 panel.SetActive(true);
                 panel.GetComponent<StageSelect>().stageNum = GM.stageNum;
+                SoundManager.get("Stage fail").Stop();
                 Time.timeScale = 1;
                 gameObject.SetActive(false);
                 break;
             case "Restart":
                 GM.stageReset();
-                GM.enabled = true;
+                GameObject.Find("Canvas").transform.Find("StartPanel").gameObject.SetActive(true);
+                SoundManager.get("Stage fail").Stop();
                 Time.timeScale = 1;
                 gameObject.SetActive(false);
                 break;
             case "Next":
                 if (GM.stageNum < 10) GM.stageNum++;
                 GM.stageReset();
-                GM.enabled = true;
+                GameObject.Find("Canvas").transform.Find("StartPanel").gameObject.SetActive(true);
                 gameObject.SetActive(false);
                 break;
         }
     }
+
 }

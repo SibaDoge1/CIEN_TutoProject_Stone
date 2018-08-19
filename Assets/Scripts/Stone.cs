@@ -18,6 +18,7 @@ public class Stone : MonoBehaviour
         GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
         mp = GameObject.Find("Main Camera").GetComponent<Map>();
         sprite = transform.GetComponent<SpriteRenderer>();
+        transform.localScale = new Vector3(0.78f, 0.97f, 1);
         isMoving = true;
     }
 
