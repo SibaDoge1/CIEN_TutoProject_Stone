@@ -137,6 +137,7 @@ public class Stone : MonoBehaviour
     {
         changeAppear('g');
         mp.deleteStone(gameObject);
+        SoundManager.get("stone").Play();
         Destroy(gameObject, 0.5f);
     }
 

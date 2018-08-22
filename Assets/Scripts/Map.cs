@@ -13,6 +13,7 @@ public class Map : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        txt = GameObject.Find("Canvas").transform.Find("Text").GetComponent<Text>();
         map = new GameObject[Width, Height];
     }
     // Update is called once per frame

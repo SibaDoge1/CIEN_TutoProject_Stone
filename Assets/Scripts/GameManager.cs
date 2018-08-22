@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
             name = spawnQueue.Peek().Substring(0, 1);
             colors = spawnQueue.Peek().Substring(2);
             prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
-            nextStone2 = Instantiate(prefab, new Vector3(visualPointX + 2.7f, visualPointY, -1), Quaternion.identity);
+            nextStone2 = Instantiate(prefab, new Vector3(visualPointX + 2.9f, visualPointY, -1), Quaternion.identity);
             nextStone2.transform.localScale = Vector3.one * 0.58f;
             for (int i = 0; i < colors.Length; i++)
             {

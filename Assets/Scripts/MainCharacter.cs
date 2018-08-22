@@ -12,6 +12,7 @@ public class MainCharacter : MonoBehaviour {
     private float moveTime;
     public Sprite alpacaS;
     public Sprite alpacaJ;
+    private Vector3 scale;
     private GameObject win;
     // Use this for initialization
     void Awake()
@@ -21,12 +22,13 @@ public class MainCharacter : MonoBehaviour {
         win = GameObject.Find("Canvas").transform.Find("Win").gameObject;
         isMoving = true;
         moveTime = 0;
+        scale = transform.localScale;
     }
 
     void OnEnable()
     {
         previousPos = transform.position;
-        targetPos = new Vector3(successPos.x, successPos.y, -2f);
+        targetPos = new Vector3(successPos.x, successPos.y + 0.35f, -2f);
     }
 
     void Start () {
@@ -39,6 +41,7 @@ public class MainCharacter : MonoBehaviour {
             if (transform.position.y >= (mp.successH + 1.5f))
             {
                 isMoving = false;
+                transform.localScale = new Vector3(0.67f, 0.67f, 1);
                 transform.GetComponent<SpriteRenderer>().sprite = alpacaJ;
                 Invoke("winPanel", 0.5f);
             }
@@ -63,6 +66,7 @@ public class MainCharacter : MonoBehaviour {
         transform.GetComponent<SpriteRenderer>().sprite = alpacaS;
         isMoving = true;
         gameObject.SetActive(false);
+        transform.localScale = scale;
     }
 
     public void winPanel()
