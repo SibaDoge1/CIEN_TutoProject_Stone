@@ -196,6 +196,8 @@ public class GameManager : MonoBehaviour
                     {
                         stone.destroy();
                     }
+                    matchQueue.Clear();
+                    return;
                 }
                 matchQueue.Clear();
             }
