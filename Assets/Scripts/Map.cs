@@ -19,6 +19,7 @@ public class Map : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        printMap();
     }
     public Vector2 roundVec2(Vector2 v)
     {
@@ -48,7 +49,7 @@ public class Map : MonoBehaviour
                         map[x, y] = null;
         Vector2 v = roundVec2(obj.transform.position);
         map[(int)v.x, (int)v.y] = obj;
-        obj.GetComponent<Stone>().mapPos = new Vector2((int)v.x, (int)v.y);
+        obj.GetComponent<Stone>().mapPos = v;
     }
 
     public void deleteStone(GameObject obj)
@@ -67,7 +68,7 @@ public class Map : MonoBehaviour
             for (int i = 0; i < Width; i++)
             {
                 if (map[i, j] == null) txt.text += "0 ";
-                else txt.text += "1 ";
+                else txt.text +=  "1 ";
             }
             txt.text += "\n";
         }

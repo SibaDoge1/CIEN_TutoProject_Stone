@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
         if(spawnQueue.Count != 0)
             next = spawnQueue.Dequeue();
         spawnNext();
-        StartCoroutine("checkRoutine");
+        //StartCoroutine("checkRoutine");
         camMove = false;
     }
     void Awake ()
@@ -108,6 +108,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public bool isAllStop() {
+        for (int y = 0; y < mp.successH; y++)
+        {
+            for (int x = 0; x < mp.Width; x++)
+            {
+                if (mp.map[x, y] == null) continue;
+                else if (mp.map[x, y].GetComponent<Stone>().isMoving) return false;
+            }
+        }
+        return true;
+    }
+
     public void visualNext()
     {
         Destroy(nextStone1);
@@ -150,15 +162,16 @@ public class GameManager : MonoBehaviour
         loose.SetActive(true);
         SoundManager.get("main").Stop();
         SoundManager.get("Stage fail").Play();
-        StopCoroutine("checkRoutine");
+        //StopCoroutine("checkRoutine");
     }
 
     public void doNext()
     {
-        StaticCoroutine.DoCoroutine(spawnNext, 0.5f);
+        StartCoroutine("doNextRoutine");
     }
 
-    public void clicked(string str) {
+    public void clicked(string str) 
+    {
         SoundManager.get("touch").Play();
         if (stoneSet == null) return;
         Debug.Log("clicked");
@@ -173,16 +186,15 @@ public class GameManager : MonoBehaviour
         Destroy(nextStone1);
         Destroy(nextStone2);
         stopMoves();
-        StopCoroutine("checkRoutine");
+        //StopCoroutine("checkRoutine");
         camMove = true;
         alpaca.GetComponent<MainCharacter>().successPos = successPos;
         UI.SetActive(false);
         nextPanel.SetActive(false);
     }
 
-
-
     public void checkMatchs() {
+        matchQueue.Clear();
         for (int y = 0; y < mp.successH; y++)
         {
             for (int x = 0; x < mp.Width; x++)
@@ -192,16 +204,15 @@ public class GameManager : MonoBehaviour
                 mp.map[x, y].GetComponent<Stone>().checkMatch();
                 if (matchQueue.Count >= maxMatchCount)
                 {
-                    foreach (Stone stone in matchQueue)
-                    {
-                        stone.destroy();
-                    }
+                    Debug.Log(matchQueue.Count);
+                    StartCoroutine("destroyRoutine", matchQueue);
                     matchQueue.Clear();
                     return;
                 }
                 matchQueue.Clear();
             }
         }
+        Invoke("spawnNext", 0.3f);
     }
 
     public void stageReset()
@@ -229,13 +240,28 @@ public class GameManager : MonoBehaviour
         this.enabled = false;
     }
 
-    IEnumerator checkRoutine()
+    IEnumerator doNextRoutine()
     {
-        while (true)
+        while (!isAllStop())
         {
-            yield return new WaitForSeconds(0.5f);
-            checkMatchs();
+            yield return new WaitForSeconds(0.1f);
         }
+        checkMatchs();
+    }
 
+
+    IEnumerator destroyRoutine(List<Stone> matchQueue)
+    {
+        List<Stone> destroyQueue = new List<Stone>(matchQueue);
+        foreach (Stone st in destroyQueue)
+        {
+            st.changeAppear('g');
+        }
+        yield return new WaitForSeconds(0.5f);
+        foreach (Stone stone in destroyQueue)
+        {
+            stone.destroy();
+        }
+        doNext();
     }
 }

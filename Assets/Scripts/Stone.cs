@@ -6,7 +6,7 @@ public class Stone : MonoBehaviour
 {
 
     public bool isMoving;
-    private char _color;
+    public char myCol;
     public Vector2 mapPos;
     private SpriteRenderer sprite;
     private GameManager GM;
@@ -32,7 +32,6 @@ public class Stone : MonoBehaviour
     {
         if (isStucked() && isMoving)
         {
-            Debug.Log("stop");
             stopMove();
         }
         if (!isStucked() && !isMoving)
@@ -83,13 +82,11 @@ public class Stone : MonoBehaviour
             mp.updateStone(gameObject);
             if (isStucked())
             {
-                Debug.Log("stop");
                 stopMove();
             }
         }
         else
         {
-            Debug.Log("not");
             transform.position -= (Vector3)vec;
         }
         posRound();
@@ -118,7 +115,8 @@ public class Stone : MonoBehaviour
             tempVec = mapPos + mp.rotate(Vector2.up, (-90f) * i);
             if (!mp.isInside(tempVec) || mp.map[(int)tempVec.x, (int)tempVec.y] == null) continue;
             tempStone = mp.map[(int)tempVec.x, (int)tempVec.y].GetComponent<Stone>();
-            if (!tempStone.isMoving && tempStone._color == _color && !GM.matchQueue.Contains(tempStone))
+            if (tempStone.myCol != myCol) Debug.Log(tempStone.mapPos + "NULL!!" + tempStone.myCol + myCol);
+            if (!tempStone.isMoving && tempStone.myCol == myCol && !GM.matchQueue.Contains(tempStone))
             {
                 tempStone.checkMatch();
             }
@@ -128,7 +126,7 @@ public class Stone : MonoBehaviour
 
     public void changeAppear(char col)
     {
-        _color = col;
+        myCol = col;
         sprite.sprite = Resources.Load<Sprite>("Images/Stone_" + col) as Sprite;
     }
 
@@ -138,15 +136,14 @@ public class Stone : MonoBehaviour
         changeAppear('g');
         mp.deleteStone(gameObject);
         SoundManager.get("stone").Play();
-        Destroy(gameObject, 0.5f);
+        Destroy(gameObject);
     }
 
     IEnumerator fall()
     {
         while (true)
         {
-            yield return new WaitForSeconds(GM.fallDelay*0.1f);
-            Debug.Log("move");
+            yield return new WaitForSeconds(GM.fallDelay*0.2f);
             Move("down");
             mp.printMap();
 
