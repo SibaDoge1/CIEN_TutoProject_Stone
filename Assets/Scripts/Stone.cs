@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
-
-    public bool isMoving;
+    public bool isMoving = true;
     public char myCol;
     public Vector2 mapPos;
     private SpriteRenderer sprite;
@@ -24,25 +23,26 @@ public class Stone : MonoBehaviour
 
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isStucked() && isMoving)
-        {
-            stopMove();
-        }
         if (!isStucked() && !isMoving)
         {
             startMove();
         }
+
+        if (isStucked() && isMoving)
+        {
+            stopMove();
+        }
     }
 
-   public bool isValidPos()
+   public bool isValidPos(Vector2 vec)
     {
-        Vector2 vec = mp.roundVec2(transform.position);
+        vec = mapPos + Map.roundVec2(vec);
         if (!mp.isInside(vec))
                 return false;
         else if (mp.map[(int)vec.x, (int)vec.y] != null && mp.map[(int)vec.x, (int)vec.y].transform.parent != transform.parent)
@@ -52,8 +52,8 @@ public class Stone : MonoBehaviour
 
     public bool isStucked()
     {
-        Vector2 vec = mp.roundVec2(transform.position);
-        if (vec.y <= 0)
+        Vector2 vec = Map.roundVec2(mapPos);
+        if ((int)vec.y == 0)
             return true;
         else if (mp.map[(int)vec.x, (int)vec.y - 1] != null && !(mp.map[(int)vec.x, (int)vec.y - 1].GetComponent<Stone>().isMoving))
             return true;
@@ -62,46 +62,22 @@ public class Stone : MonoBehaviour
 
     public void startMove()
     {
-        GM.stopMoves += stopMove;
-        StartCoroutine("fall");
         isMoving = true;
+        StartCoroutine("fall");
     }
 
-    public void Move(string dir)
+    public void Move(Vector2 vec)
     {
-        Vector2 vec = Vector2.zero;
-        switch (dir)
+        vec = Map.roundVec2(vec);
+        if (isValidPos(vec))
         {
-            case "left": vec = Vector2.left; break;
-            case "right": vec = Vector2.right; break;
-            case "down": vec = Vector2.down; break;
+            mp.updateStone(gameObject, mapPos + vec);
         }
-        transform.position += (Vector3)vec;
-        if (isValidPos())
-        {
-            mp.updateStone(gameObject);
-            if (isStucked())
-            {
-                stopMove();
-            }
-        }
-        else
-        {
-            transform.position -= (Vector3)vec;
-        }
-        posRound();
-    }
-
-    public void posRound()
-    {
-        Vector2 origin = mp.roundVec2(transform.position);
-        transform.position = origin;
     }
 
     public void stopMove()
     {
         isMoving = false;
-        GM.stopMoves -= stopMove;
         StopCoroutine("fall");
     }
 
@@ -112,7 +88,10 @@ public class Stone : MonoBehaviour
         Stone tempStone;
         for (int i = 0; i < 4; i++)
         {
-            tempVec = mapPos + mp.rotate(Vector2.up, (-90f) * i);
+            tempVec = mapPos + Map.rotate(Vector2.up, (-90f) * i);
+            tempVec = Map.roundVec2(tempVec);
+            //Debug.Log(Map.rotate(Vector2.up, (-90f) * i));
+            Debug.Log(mapPos + "+" + Map.rotate(Vector2.up, (-90f) * i) + " = " + (int)tempVec.y);
             if (!mp.isInside(tempVec) || mp.map[(int)tempVec.x, (int)tempVec.y] == null) continue;
             tempStone = mp.map[(int)tempVec.x, (int)tempVec.y].GetComponent<Stone>();
             if (tempStone.myCol != myCol) Debug.Log(tempStone.mapPos + "NULL!!" + tempStone.myCol + myCol);
@@ -144,8 +123,7 @@ public class Stone : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(GM.fallDelay*0.2f);
-            Move("down");
-            mp.printMap();
+            Move(Vector2.down);
 
         }
     }

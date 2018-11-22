@@ -4,34 +4,40 @@ using UnityEngine;
 
 public class StoneSet : MonoBehaviour
 {
+    public enum stoneType { I, J, L, O, S, Z, T };
     private Transform[] children;
     private GameManager GM;
     private Map mp;
+    protected int[,,,] rotationData = new int[7, 4, 4, 2]
+    {   
+        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
+        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
+        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
+        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
+        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
+        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
+        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} }
+    };
 
     // Use this for initialization
 
     void Awake()
     {
+        children = gameObject.GetComponentsInChildren<Transform>();
+        mp = GameObject.Find("Main Camera").GetComponent<Map>();
+        GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
     }
 
     void Start()
     {
-        children = gameObject.GetComponentsInChildren<Transform>();
-        mp = GameObject.Find("Main Camera").GetComponent<Map>();
-        GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
-        updateMap();
-        posRoundSet();
+        firstSet();
         StartCoroutine("fall");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isStuckedSet())
-        {
-            Debug.Log("stop");
-            stopMove();
-        }
+
     }
 
     public void clicked(string str)
@@ -41,68 +47,27 @@ public class StoneSet : MonoBehaviour
             case "left": Move("left"); break;
             case "right": Move("right"); break;
             case "down": Move("down"); break;
-            case "up":
-
-                if (gameObject.CompareTag("Ostone"))
-                    transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, -90f);
-                else if (gameObject.CompareTag("Istone"))
-                {
-                    transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, -90f);
-                    Debug.Log(transform.eulerAngles.z+"이다");
-                    if (transform.eulerAngles.z % 180 == 90)
-                    {
-                        Debug.Log("90임");
-                        transform.Translate(0.5f, -0.5f, 0, Space.World);
-                    }
-                    if (transform.eulerAngles.z % 180 == 0)
-                    {
-                        Debug.Log("0임");
-                        transform.Translate(-0.5f, 0.5f, 0, Space.World);
-                    }
-                }
-                else
-                    transform.Rotate(0, 0, -90);
-                if (isValidPosSet())
-                {
-                    updateMap();
-                    foreach (Transform child in children)
-                    {
-                        if (child.gameObject == gameObject || !child.CompareTag("Stone"))
-                            continue;
-                        child.Rotate(0, 0, 90f);
-                    }
-                }
-                else
-                {
-                    if (gameObject.CompareTag("Ostone"))
-                        transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, 90f);
-                    else if (gameObject.CompareTag("Istone"))
-                    {
-                        if (transform.eulerAngles.z % 180 == 90)
-                            transform.Translate(-0.5f, 0.5f, 0, Space.World);
-                        if (transform.eulerAngles.z % 180 == 0)
-                            transform.Translate(0.5f, -0.5f, 0, Space.World);
-                        transform.RotateAround(transform.Find("rotate").transform.position, Vector3.forward, 90f);
-
-                    }
-                    else
-                        transform.Rotate(0, 0, 90);
-                }
-                break;
+            case "up": rotate(); break;
         }
     }
 
-    public bool isValidPosSet()
+    public virtual void rotate()
+    {
+
+    }
+
+    public bool isValidPosSet(Vector2 vec)
     {
         foreach (Transform child in children)
         {
             if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
-            if (!(child.gameObject.GetComponent<Stone>().isValidPos()))
-                return false; 
+            if (!(child.gameObject.GetComponent<Stone>().isValidPos(vec)))
+                return false;
         }
         return true;
     }
+
     public bool isStuckedSet()
     {
         foreach (Transform child in children)
@@ -122,43 +87,36 @@ public class StoneSet : MonoBehaviour
         {
             case "left": vec = Vector2.left; break;
             case "right": vec = Vector2.right; break;
-            case "down": vec = Vector2.down; break;
+            case "down":
+                vec = Vector2.down;
+                if (isStuckedSet())
+                {
+                    Debug.Log("stop");
+                    stopMove();
+                    return;
+                }
+                break;
         }
-        transform.position += (Vector3)vec;
-        if (isValidPosSet())
-        {
-            updateMap();
-        }
-        else
-        {
-            Debug.Log("not");
-            transform.position -= (Vector3)vec;
-        }
-        posRoundSet();
-    }
-
-    public void posRoundSet()
-    {
-        Vector2 origin = mp.roundVec2(transform.position);
-        transform.position = origin;
+        if (!isValidPosSet(vec)) return;
+        Debug.Log("valid");
         foreach (Transform child in children)
         {
             if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
-            child.gameObject.GetComponent<Stone>().posRound();
+            child.gameObject.GetComponent<Stone>().Move(vec);
         }
     }
 
-    public void updateMap()
+    public void firstSet()
     {
         foreach (Transform child in children)
         {
             if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
-            mp.updateStone(child.gameObject);
+            child.transform.GetComponent<Stone>().mapPos = new Vector2(-1, -1);
+            mp.updateStone(child.gameObject, Map.roundVec2(child.transform.position));
         }
     }
-
     public void stopMove()
     {
         StopCoroutine("fall");

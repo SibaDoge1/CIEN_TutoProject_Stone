@@ -15,13 +15,12 @@ public class GameManager : MonoBehaviour
     public int maxMatchCount;
     public Queue<string> spawnQueue = new Queue<string> { };
     public List<Stone> matchQueue = new List<Stone>{ };
-    public StaticCoroutine.func stopMoves;
+    public GameObject alpaca;
     private GameObject stoneSet;
     private bool isSuccess = false;
     private Map mp;
     private GameObject win;
     private GameObject loose;
-    public GameObject alpaca;
     private bool camMove;
     private GameObject UI;
     private string next;
@@ -37,7 +36,6 @@ public class GameManager : MonoBehaviour
             if (!dic.Value.Equals("-1") && !dic.Value.Equals("")) spawnQueue.Enqueue(dic.Value);
         }
         Debug.Log(stageNum+"스테이지임");
-        stopMoves = () => { };
         if(spawnQueue.Count != 0)
             next = spawnQueue.Dequeue();
         spawnNext();
@@ -77,7 +75,7 @@ public class GameManager : MonoBehaviour
 
     public void spawnNext()
     {
-        for (int i = 0; i < mp.Width; i++)
+        for (int i = 0; i < mp.width; i++)
         {
             if (mp.map[i, mp.successH] == null) continue;
             else if (!mp.map[i, mp.successH].GetComponent<Stone>().isMoving)
@@ -92,16 +90,17 @@ public class GameManager : MonoBehaviour
             Loose();
             return;
         }
-        string block = next;
+        string current = next;
         if(spawnQueue.Count != 0)
             next = spawnQueue.Dequeue();
         else
             next = null;
         visualNext();
-        string name = block.Substring(0, 1);
-        string colors = block.Substring(2);
+        string name = current.Substring(0, 1);
+        string colors = current.Substring(2);
         GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
-        stoneSet = Instantiate(prefab, new Vector3(spawnPointX, spawnPointY, 2), Quaternion.identity);
+        stoneSet = Instantiate(prefab, new Vector3(spawnPointX, spawnPointY, 0), Quaternion.identity);
+        stoneSet.transform.GetComponent<StoneSet>().enabled= true;
         for (int i = 0; i < colors.Length; i++)
         {
             stoneSet.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);
@@ -111,7 +110,7 @@ public class GameManager : MonoBehaviour
     public bool isAllStop() {
         for (int y = 0; y < mp.successH; y++)
         {
-            for (int x = 0; x < mp.Width; x++)
+            for (int x = 0; x < mp.width; x++)
             {
                 if (mp.map[x, y] == null) continue;
                 else if (mp.map[x, y].GetComponent<Stone>().isMoving) return false;
@@ -134,6 +133,7 @@ public class GameManager : MonoBehaviour
         string colors = next.Substring(2);
         GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
         nextStone1 = Instantiate(prefab, new Vector3(visualPointX, visualPointY, -1), Quaternion.identity);
+        
         nextStone1.transform.localScale = Vector3.one * 0.58f;
         for (int i = 0; i < colors.Length; i++)
         {
@@ -185,7 +185,6 @@ public class GameManager : MonoBehaviour
         SoundManager.get("Stage win").Play();
         Destroy(nextStone1);
         Destroy(nextStone2);
-        stopMoves();
         //StopCoroutine("checkRoutine");
         camMove = true;
         alpaca.GetComponent<MainCharacter>().successPos = successPos;
@@ -197,7 +196,7 @@ public class GameManager : MonoBehaviour
         matchQueue.Clear();
         for (int y = 0; y < mp.successH; y++)
         {
-            for (int x = 0; x < mp.Width; x++)
+            for (int x = 0; x < mp.width; x++)
             {
                 if (mp.map[x, y] == null) continue;
                 else if (mp.map[x, y].GetComponent<Stone>().isMoving) continue;
@@ -217,8 +216,8 @@ public class GameManager : MonoBehaviour
 
     public void stageReset()
     {
-        for (int y = 0; y < mp.Height; ++y)
-            for (int x = 0; x < mp.Width; ++x)
+        for (int y = 0; y < mp.height; ++y)
+            for (int x = 0; x < mp.width; ++x)
                 if (mp.map[x, y] != null)
                 {
                     Destroy(mp.map[x, y]);
@@ -231,7 +230,6 @@ public class GameManager : MonoBehaviour
         Destroy(nextStone2);
         isSuccess = false;
         matchQueue.Clear();
-        stopMoves = () => { };
         transform.position = new Vector3(transform.position.x, 5.5f, transform.position.z);
         alpaca.GetComponent<MainCharacter>().reset();
         UI.SetActive(true);
@@ -244,8 +242,9 @@ public class GameManager : MonoBehaviour
     {
         while (!isAllStop())
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.05f);
         }
+        yield return new WaitForSeconds(0.2f);
         checkMatchs();
     }
 
