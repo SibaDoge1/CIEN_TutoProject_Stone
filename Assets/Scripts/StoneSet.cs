@@ -5,19 +5,11 @@ using UnityEngine;
 public class StoneSet : MonoBehaviour
 {
     public enum stoneType { I, J, L, O, S, Z, T };
-    private Transform[] children;
-    private GameManager GM;
-    private Map mp;
-    protected int[,,,] rotationData = new int[7, 4, 4, 2]
-    {   
-        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
-        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
-        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
-        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
-        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
-        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} },
-        { {{,},{,},{,},{,}}, {{,},{,},{,},{,}}, {{,},{,},{,},{,} }, {{,},{,},{,},{,}} }
-    };
+    protected Transform[] children;
+    protected GameManager GM;
+    protected Map mp;
+    protected int[,,] rotationData = new int[4, 4, 2];
+    protected int[,,] wallKickData = new int[4, 4, 2];
 
     // Use this for initialization
 
@@ -46,7 +38,7 @@ public class StoneSet : MonoBehaviour
         {
             case "left": Move("left"); break;
             case "right": Move("right"); break;
-            case "down": Move("down"); break;
+            case "down": resetFall(); Move("down");  break;
             case "up": rotate(); break;
         }
     }
@@ -54,6 +46,12 @@ public class StoneSet : MonoBehaviour
     public virtual void rotate()
     {
 
+    }
+
+    public void resetFall()
+    {
+        StopCoroutine("fall");
+        StartCoroutine("fall");
     }
 
     public bool isValidPosSet(Vector2 vec)
