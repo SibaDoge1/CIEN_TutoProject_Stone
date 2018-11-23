@@ -100,7 +100,6 @@ public class GameManager : MonoBehaviour
         string colors = current.Substring(2);
         GameObject prefab = Resources.Load("Prefabs/StoneSet" + name) as GameObject;
         stoneSet = Instantiate(prefab, new Vector3(spawnPointX, spawnPointY, 0), Quaternion.identity);
-        stoneSet.transform.GetComponent<StoneSet>().enabled= true;
         for (int i = 0; i < colors.Length; i++)
         {
             stoneSet.transform.GetChild(i).GetComponent<Stone>().changeAppear(colors[i]);

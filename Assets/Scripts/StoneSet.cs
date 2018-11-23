@@ -8,16 +8,23 @@ public class StoneSet : MonoBehaviour
     protected Transform[] children;
     protected GameManager GM;
     protected Map mp;
+    protected int degree;
     protected int[,,] rotationData = new int[4, 4, 2];
-    protected int[,,] wallKickData = new int[4, 4, 2];
-
+    protected int[,,] wallKickData = new int[4, 5, 2]
+        {
+            {{0,0},{-1,0},{-1,1},{0,-2},{-1,-2}},
+            {{0,0},{1,0},{1,-1},{0,2},{1,2}},
+            {{0,0},{1,0},{1,1},{0,-2},{1,-2}},
+            {{0,0},{-1,0},{-1,-1},{0,2},{-1,2}}
+        };
     // Use this for initialization
 
-    void Awake()
+    protected virtual void Awake()
     {
         children = gameObject.GetComponentsInChildren<Transform>();
         mp = GameObject.Find("Main Camera").GetComponent<Map>();
         GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
+        degree = 0;
     }
 
     void Start()
@@ -45,7 +52,25 @@ public class StoneSet : MonoBehaviour
 
     public virtual void rotate()
     {
-
+        bool isValid = true;
+        for (int _case = 0; _case < 5; _case++)
+        {
+            isValid = true;
+            for (int idx = 0; idx < 4; idx++)
+            {
+                Vector2 vec = new Vector2(rotationData[degree, idx, 0] + wallKickData[degree, _case, 0], rotationData[degree, idx, 1] + wallKickData[degree, _case, 1]);
+                if (!transform.GetChild(idx).GetComponent<Stone>().isValidPos(vec)) isValid = false;
+            }
+            for (int idx = 0; idx < 4; idx++)
+            {
+                Vector2 vec = new Vector2(rotationData[degree, idx, 0] + wallKickData[degree, _case, 0], rotationData[degree, idx, 1] + wallKickData[degree, _case, 1]);
+                if (isValid) transform.GetChild(idx).GetComponent<Stone>().Move(vec);
+            }
+            if (isValid)
+            {
+                degree = (degree + 1) % 4; break;
+            }
+        }
     }
 
     public void resetFall()
