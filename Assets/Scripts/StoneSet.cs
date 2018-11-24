@@ -1,13 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StoneSet : MonoBehaviour
 {
-    public enum stoneType { I, J, L, O, S, Z, T };
     protected Transform[] children;
-    protected GameManager GM;
-    protected Map mp;
     protected int degree;
     protected int[,,] rotationData = new int[4, 4, 2];
     protected int[,,] wallKickData = new int[4, 5, 2]
@@ -22,8 +18,6 @@ public class StoneSet : MonoBehaviour
     protected virtual void Awake()
     {
         children = gameObject.GetComponentsInChildren<Transform>();
-        mp = GameObject.Find("Main Camera").GetComponent<Map>();
-        GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
         degree = 0;
     }
 
@@ -47,7 +41,17 @@ public class StoneSet : MonoBehaviour
             case "right": Move("right"); break;
             case "down": resetFall(); Move("down");  break;
             case "up": rotate(); break;
+            case "fulldown": fullDown(); break;
         }
+    }
+
+    public void fullDown()
+    {
+        while(!isStuckedSet())
+        {
+            Move("down");
+        }
+        stopMove();
     }
 
     public virtual void rotate()
@@ -114,14 +118,13 @@ public class StoneSet : MonoBehaviour
                 vec = Vector2.down;
                 if (isStuckedSet())
                 {
-                    Debug.Log("stop");
                     stopMove();
                     return;
                 }
                 break;
         }
         if (!isValidPosSet(vec)) return;
-        Debug.Log("valid");
+
         foreach (Transform child in children)
         {
             if (child.gameObject == gameObject || !child.CompareTag("Stone"))
@@ -137,7 +140,7 @@ public class StoneSet : MonoBehaviour
             if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
             child.transform.GetComponent<Stone>().mapPos = new Vector2(-1, -1);
-            mp.updateStone(child.gameObject, Map.roundVec2(child.transform.position));
+            Map.Instance.updateStone(child.transform.GetComponent<Stone>(), Vec2Math.roundVec2(child.transform.position));
         }
     }
     public void stopMove()
@@ -150,17 +153,15 @@ public class StoneSet : MonoBehaviour
             child.gameObject.GetComponent<Stone>().startMove();
             child.parent = null;
         }
-        GM.doNext();
+        StageManager.Instance.doNext();
         Destroy(gameObject);
     }
-
 
     IEnumerator fall()
     {
         while (true)
         {
-            yield return new WaitForSeconds(GM.fallDelay);
-            Debug.Log("move");
+            yield return new WaitForSeconds(StageManager.Instance.fallDelay);
             Move("down");
 
         }

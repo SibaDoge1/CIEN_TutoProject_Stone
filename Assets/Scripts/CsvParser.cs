@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
-//갓원재 센세
 public static class CsvParser
 {
 

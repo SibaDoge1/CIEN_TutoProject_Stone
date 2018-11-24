@@ -1,49 +1,52 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class StageSelect : MonoBehaviour {
+public class StageSelect : MonoBehaviour
+{
 
-    public int stageNum = 1;
-    private Text numText;
-    private GameManager GM;
-    // Use this for initialization
+    protected int stageNum = 1;
+    protected Text numText;
+
     void Awake()
     {
         numText = transform.Find("Num").GetComponent<Text>();
-        GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
     }
+
     void OnEnable()
     {
         SoundManager.get("main start").Play();
     }
-    void Start () {
-        
-    }
-	
-	// Update is called once per frame
-	void Update () {
+
+    protected virtual void stageUp()
+    {
+        if (stageNum < 10) stageNum++;
         numText.text = stageNum.ToString();
     }
 
-    public void up()
+    private void stageDown()
     {
-        SoundManager.get("touch").Play();
-        if (stageNum < 10) stageNum++;
-    }
-    public void down()
-    {
-        SoundManager.get("touch").Play();
         if (stageNum > 1) stageNum--;
+        numText.text = stageNum.ToString();
     }
-    public void start()
+
+    private void start()
     {
         SoundManager.get("touch").Play();
         SoundManager.get("main start").Stop();
-        GM.stageNum = stageNum;
-        GameObject.Find("Canvas").transform.Find("StartPanel").gameObject.SetActive(true);
+        GameObject startPanel = GameObject.Find("Canvas").transform.Find("StartPanel").gameObject;
+        startPanel.GetComponent<StartPanel>().stageNum = stageNum;
+        startPanel.SetActive(true);
         gameObject.SetActive(false);
-
     }
+
+    public void clicked(string str)
+    {
+        SoundManager.get("touch").Play();
+        switch (str)
+        {
+            case "StageUp": stageUp(); break;
+            case "StageDown": stageDown(); break;
+            case "Start": start(); break;
+        }
+    }    
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Stone : MonoBehaviour
@@ -8,14 +7,10 @@ public class Stone : MonoBehaviour
     public char myCol;
     public Vector2 mapPos;
     private SpriteRenderer sprite;
-    private GameManager GM;
-    private Map mp;
     // Use this for initialization
 
     void Awake()
     {
-        GM = GameObject.Find("Main Camera").GetComponent<GameManager>();
-        mp = GameObject.Find("Main Camera").GetComponent<Map>();
         sprite = transform.GetComponent<SpriteRenderer>();
         transform.localScale = new Vector3(0.78f, 0.97f, 1);
         isMoving = true;
@@ -42,20 +37,20 @@ public class Stone : MonoBehaviour
 
    public bool isValidPos(Vector2 vec)
     {
-        vec = mapPos + Map.roundVec2(vec);
-        if (!mp.isInside(vec))
+        vec = mapPos + Vec2Math.roundVec2(vec);
+        if (!Map.Instance.isInside(vec))
                 return false;
-        else if (mp.map[(int)vec.x, (int)vec.y] != null && mp.map[(int)vec.x, (int)vec.y].transform.parent != transform.parent)
+        else if (Map.Instance.getStone(vec) != null && Map.Instance.getStone(vec).transform.parent != transform.parent)
                 return false;
         return true;
     }
 
     public bool isStucked()
     {
-        Vector2 vec = Map.roundVec2(mapPos);
+        Vector2 vec = Vec2Math.roundVec2(mapPos);
         if ((int)vec.y == 0)
             return true;
-        else if (mp.map[(int)vec.x, (int)vec.y - 1] != null && !(mp.map[(int)vec.x, (int)vec.y - 1].GetComponent<Stone>().isMoving))
+        else if (Map.Instance.getStone(vec + Vector2.down) != null && !(Map.Instance.getStone(vec + Vector2.down).GetComponent<Stone>().isMoving))
             return true;
         return false;
     }
@@ -68,10 +63,10 @@ public class Stone : MonoBehaviour
 
     public void Move(Vector2 vec)
     {
-        vec = Map.roundVec2(vec);
+        vec = Vec2Math.roundVec2(vec);
         if (isValidPos(vec))
         {
-            mp.updateStone(gameObject, mapPos + vec);
+            Map.Instance.updateStone(this, mapPos + vec);
         }
     }
 
@@ -83,19 +78,15 @@ public class Stone : MonoBehaviour
 
     public void checkMatch()
     {
-        GM.matchQueue.Add(this);
+        StageManager.Instance.matchQueue.Add(this);
         Vector2 tempVec;
         Stone tempStone;
         for (int i = 0; i < 4; i++)
         {
-            tempVec = mapPos + Map.rotate(Vector2.up, (-90f) * i);
-            tempVec = Map.roundVec2(tempVec);
-            //Debug.Log(Map.rotate(Vector2.up, (-90f) * i));
-            Debug.Log(mapPos + "+" + Map.rotate(Vector2.up, (-90f) * i) + " = " + (int)tempVec.y);
-            if (!mp.isInside(tempVec) || mp.map[(int)tempVec.x, (int)tempVec.y] == null) continue;
-            tempStone = mp.map[(int)tempVec.x, (int)tempVec.y].GetComponent<Stone>();
-            if (tempStone.myCol != myCol) Debug.Log(tempStone.mapPos + "NULL!!" + tempStone.myCol + myCol);
-            if (!tempStone.isMoving && tempStone.myCol == myCol && !GM.matchQueue.Contains(tempStone))
+            tempVec = Vec2Math.roundVec2(mapPos + Vec2Math.rotate(Vector2.up, (-90f) * i));
+            tempStone = Map.Instance.getStone(tempVec);
+            if (Map.Instance.getStone(tempVec) == null) continue;
+            if (!tempStone.isMoving && tempStone.myCol == myCol && !StageManager.Instance.matchQueue.Contains(tempStone))
             {
                 tempStone.checkMatch();
             }
@@ -113,7 +104,7 @@ public class Stone : MonoBehaviour
     public void destroy()
     {
         changeAppear('g');
-        mp.deleteStone(gameObject);
+        Map.Instance.deleteStone(this);
         SoundManager.get("stone").Play();
         Destroy(gameObject);
     }
@@ -122,7 +113,7 @@ public class Stone : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(GM.fallDelay*0.2f);
+            yield return new WaitForSeconds(StageManager.Instance.fallDelay*0.1f);
             Move(Vector2.down);
 
         }
