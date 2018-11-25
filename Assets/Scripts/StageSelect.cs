@@ -17,19 +17,14 @@ public class StageSelect : MonoBehaviour
         SoundManager.get("main start").Play();
     }
 
-    protected virtual void stageUp()
+    protected virtual void stageChange(int i)
     {
-        if (stageNum < 10) stageNum++;
+        stageNum += i;
+        if (stageNum > 10) stageNum = 10;
+        if (stageNum < 1) stageNum = 1;
         numText.text = stageNum.ToString();
     }
-
-    private void stageDown()
-    {
-        if (stageNum > 1) stageNum--;
-        numText.text = stageNum.ToString();
-    }
-
-    private void start()
+    protected void start()
     {
         SoundManager.get("touch").Play();
         SoundManager.get("main start").Stop();
@@ -39,13 +34,13 @@ public class StageSelect : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void clicked(string str)
+    public virtual void clicked(string str)
     {
         SoundManager.get("touch").Play();
         switch (str)
         {
-            case "StageUp": stageUp(); break;
-            case "StageDown": stageDown(); break;
+            case "StageUp": stageChange(1); break;
+            case "StageDown": stageChange(-1); break;
             case "Start": start(); break;
         }
     }    

@@ -19,9 +19,10 @@ public class Alpaca : MonoBehaviour
     {
         win = GameObject.Find("Canvas").transform.Find("Win").gameObject;
         isMoving = true;
-        elapsedTime = 0;
         initailPos = transform.position;
+        elapsedTime = 0;
         scale = transform.localScale;
+        gameObject.SetActive(false);
     }
 
     void OnEnable()
@@ -61,12 +62,15 @@ public class Alpaca : MonoBehaviour
         elapsedTime = 0;
         transform.GetComponent<SpriteRenderer>().sprite = alpacaS;
         isMoving = true;
-        gameObject.SetActive(false);
         transform.localScale = scale;
+        gameObject.SetActive(false);
     }
 
     public void activeWin()
     {
+
+        SoundManager.get("main").Stop();
+        SoundManager.get("Stage win").Play();
         win.SetActive(true);
     }
 }

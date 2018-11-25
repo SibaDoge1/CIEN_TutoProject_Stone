@@ -12,7 +12,7 @@ public class StageManager : MonoBehaviour
     public float visualPointX;
     public float visualPointY;
     public float visualBetweenDistanceY;
-    public int maxMatchCount;
+    public int MatchCount;
     public int successH; //쌓아야하는 칸(0부터 시작)
     public int stageNum;
     public GameObject alpaca;
@@ -128,12 +128,12 @@ public class StageManager : MonoBehaviour
     }
 
     public bool isAllStop() {
-        for (int y = 0; y < successH; y++)
+        for (int y = 0; y < Map.Instance.height; y++)
         {
             for (int x = 0; x < Map.Instance.width; x++)
             {
                 if (Map.Instance.getStone(new Vector2(x, y)) == null) continue;
-                else if (Map.Instance.getStone(new Vector2(x, y)).GetComponent<Stone>().isMoving) return false;
+                else if (Map.Instance.getStone(new Vector2(x, y)).isMoving) return false;
             }
         }
         return true;
@@ -199,8 +199,6 @@ public class StageManager : MonoBehaviour
     public void success(Vector3 successPos)
     {
         isSuccess = true;
-        SoundManager.get("main").Stop();
-        SoundManager.get("Stage win").Play();
         Destroy(nextStone1);
         Destroy(nextStone2);
         isCamMove = true;
@@ -218,7 +216,7 @@ public class StageManager : MonoBehaviour
                 if (Map.Instance.getStone(new Vector2(x, y)) == null) continue;
                 else if (Map.Instance.getStone(new Vector2(x, y)).isMoving) continue;
                 Map.Instance.getStone(new Vector2(x, y)).checkMatch();
-                if (matchQueue.Count >= maxMatchCount)
+                if (matchQueue.Count >= MatchCount)
                 {
                     StartCoroutine("destroyRoutine", matchQueue);
                     matchQueue.Clear();
@@ -253,11 +251,11 @@ public class StageManager : MonoBehaviour
 
     protected IEnumerator checkMatchsRoutine()
     {
+        yield return new WaitForSeconds(0.1f);
         while (!isAllStop())
         {
-            yield return new WaitForSeconds(0.02f);
+            yield return null;
         }
-        yield return new WaitForSeconds(0.1f);
         checkMatchs();
     }
 

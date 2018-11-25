@@ -2,12 +2,10 @@
 using UnityEngine.SceneManagement;
 
 public class Setting : MonoBehaviour {
-    private GameObject panel;
     private GameObject Option;
 
     void Awake()
     {
-        panel = GameObject.Find("Canvas").transform.Find("Panel").gameObject;
         Option = GameObject.Find("Canvas").transform.Find("Option").gameObject;
     }
 
@@ -22,16 +20,6 @@ public class Setting : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
-    /*public void gotoMenu()
-    {
-        StageManager.Instance.stageReset();
-        panel.SetActive(true);
-        panel.GetComponent<StageSelect>().stageNum = StageManager.Instance.stageNum;
-        SoundManager.get("Stage fail").Stop();
-        Time.timeScale = 1;
-        gameObject.SetActive(false);
-    }*/
-
     public void gotoMenu()
     {
         Time.timeScale = 1;
@@ -40,20 +28,23 @@ public class Setting : MonoBehaviour {
 
     public void restart()
     {
+        Time.timeScale = 1;
         if (!StageManager.Instance.enabled) return;
         StageManager.Instance.stageReset();
         GameObject.Find("Canvas").transform.Find("StartPanel").gameObject.SetActive(true);
         SoundManager.get("Stage fail").Stop();
-        Time.timeScale = 1;
         gameObject.SetActive(false);
     }
 
-    public void Next()
+    public void next()
     {
-        if (StageManager.Instance.stageNum < 10) StageManager.Instance.stageNum++;
+
+        Time.timeScale = 1;
+        StartPanel sp = GameObject.Find("Canvas").transform.Find("StartPanel").GetComponent<StartPanel>();
+        sp.stageNum++;
+        if (sp.stageNum > 10) sp.stageNum = 10;
         StageManager.Instance.stageReset();
         GameObject.Find("Canvas").transform.Find("StartPanel").gameObject.SetActive(true);
-        Time.timeScale = 1;
         gameObject.SetActive(false);
     }
 
@@ -66,7 +57,7 @@ public class Setting : MonoBehaviour {
             case "Close": close(); break;
             case "GotoMenu": gotoMenu(); break;
             case "Restart": restart(); break;
-            case "Next": Next(); break;
+            case "Next": next(); break;
         }
     }
 

@@ -27,19 +27,13 @@ public class StoneSet : MonoBehaviour
         StartCoroutine("fall");
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void clicked(string str)
     {
         switch (str)
         {
             case "left": Move("left"); break;
             case "right": Move("right"); break;
-            case "down": resetFall(); Move("down");  break;
+            case "down": Move("down"); break;
             case "up": rotate(); break;
             case "fulldown": fullDown(); break;
         }
@@ -56,7 +50,7 @@ public class StoneSet : MonoBehaviour
 
     public virtual void rotate()
     {
-        bool isValid = true;
+        bool isValid;
         for (int _case = 0; _case < 5; _case++)
         {
             isValid = true;
@@ -72,7 +66,8 @@ public class StoneSet : MonoBehaviour
             }
             if (isValid)
             {
-                degree = (degree + 1) % 4; break;
+                degree = (degree + 1) % 4;
+                return;
             }
         }
     }
@@ -115,22 +110,23 @@ public class StoneSet : MonoBehaviour
             case "left": vec = Vector2.left; break;
             case "right": vec = Vector2.right; break;
             case "down":
-                vec = Vector2.down;
                 if (isStuckedSet())
                 {
                     stopMove();
                     return;
                 }
+                vec = Vector2.down;
                 break;
         }
         if (!isValidPosSet(vec)) return;
-
+        
         foreach (Transform child in children)
         {
             if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
             child.gameObject.GetComponent<Stone>().Move(vec);
         }
+        if(dir == "down") resetFall();
     }
 
     public void firstSet()
@@ -146,14 +142,14 @@ public class StoneSet : MonoBehaviour
     public void stopMove()
     {
         StopCoroutine("fall");
+        StageManager.Instance.doNext();
         foreach (Transform child in children)
         {
             if (child.gameObject == gameObject || !child.CompareTag("Stone"))
                 continue;
-            child.gameObject.GetComponent<Stone>().startMove();
             child.parent = null;
+            child.GetComponent<Stone>().startMove();
         }
-        StageManager.Instance.doNext();
         Destroy(gameObject);
     }
 

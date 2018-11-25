@@ -8,7 +8,6 @@ public class BackGroundAlpaca : MonoBehaviour
     // Use this for initialization
     void Awake ()
     {
-        Debug.Log("awake!");
         rigid = GetComponent<Rigidbody2D>();
         StartCoroutine("jump");
     }

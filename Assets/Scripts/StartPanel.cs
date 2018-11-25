@@ -14,7 +14,6 @@ public class StartPanel : MonoBehaviour
 
     void OnEnable()
     {
-        Debug.Log(stageNum);
         numText.text = stageNum.ToString();
         Invoke("startStage", 1.0f);
     }

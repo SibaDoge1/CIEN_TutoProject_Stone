@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Stone : MonoBehaviour
 {
-    public bool isMoving = true;
+    public bool isMoving;
     public char myCol;
     public Vector2 mapPos;
     private SpriteRenderer sprite;
@@ -22,14 +22,14 @@ public class Stone : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        if (!isStucked() && !isMoving)
+        if (!isStucked() && !isMoving && transform.parent == null)
         {
             startMove();
         }
 
-        if (isStucked() && isMoving)
+        if (isStucked() && isMoving && transform.parent == null)
         {
             stopMove();
         }
@@ -50,7 +50,7 @@ public class Stone : MonoBehaviour
         Vector2 vec = Vec2Math.roundVec2(mapPos);
         if ((int)vec.y == 0)
             return true;
-        else if (Map.Instance.getStone(vec + Vector2.down) != null && !(Map.Instance.getStone(vec + Vector2.down).GetComponent<Stone>().isMoving))
+        else if (Map.Instance.getStone(vec + Vector2.down) != null && !(Map.Instance.getStone(vec + Vector2.down).isMoving))
             return true;
         return false;
     }
@@ -72,8 +72,8 @@ public class Stone : MonoBehaviour
 
     public void stopMove()
     {
-        isMoving = false;
         StopCoroutine("fall");
+        isMoving = false;
     }
 
     public void checkMatch()
