@@ -66,7 +66,7 @@ public class Alpaca : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void activeWin()
+    private void activeWin()
     {
 
         SoundManager.get("main").Stop();

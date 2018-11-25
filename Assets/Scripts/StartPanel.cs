@@ -18,7 +18,7 @@ public class StartPanel : MonoBehaviour
         Invoke("startStage", 1.0f);
     }
 
-    void startStage()
+    private void startStage()
     {
         StageManager.Instance.stageNum = stageNum;
         StageManager.Instance.enabled = true;

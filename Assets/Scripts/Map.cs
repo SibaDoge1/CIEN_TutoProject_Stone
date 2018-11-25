@@ -47,20 +47,7 @@ public class Map : MonoBehaviour
         stone.GetComponent<Stone>().mapPos = v;
     }
 
-    public void visualizeMap()
-    {
-        for (int y = 0; y < height; ++y)
-        {
-            for (int x = 0; x < width; ++x)
-            {
-                if (map[x, y] != null)
-                {
-                    Vector2 mapPos = map[x, y].mapPos;
-                    map[x, y].transform.position = new Vector3(mapPos.x, mapPos.y, 0);
-                }
-            }
-        }
-    }
+
 
     public void deleteStone(Stone stone)
     {
@@ -76,5 +63,20 @@ public class Map : MonoBehaviour
         vec = Vec2Math.roundVec2(vec);
         if (!isInside(vec) || map[(int)vec.x, (int)vec.y] == null) return null;
         return map[(int)vec.x, (int)vec.y];
+    }
+
+    private void visualizeMap()
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                if (map[x, y] != null)
+                {
+                    Vector2 mapPos = map[x, y].mapPos;
+                    map[x, y].transform.position = new Vector3(mapPos.x, mapPos.y, 0);
+                }
+            }
+        }
     }
 }

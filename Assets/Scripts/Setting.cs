@@ -9,24 +9,24 @@ public class Setting : MonoBehaviour {
         Option = GameObject.Find("Canvas").transform.Find("Option").gameObject;
     }
 
-    public void open()
+    private void open()
     {
         Option.SetActive(true); Time.timeScale = 0;
     }
 
-    public void close()
+    private void close()
     {
         Option.SetActive(true); Time.timeScale = 1;
         gameObject.SetActive(false);
     }
 
-    public void gotoMenu()
+    private void gotoMenu()
     {
         Time.timeScale = 1;
         SceneManager.LoadScene("MainMenu");
     }
 
-    public void restart()
+    private void restart()
     {
         Time.timeScale = 1;
         if (!StageManager.Instance.enabled) return;
@@ -36,7 +36,7 @@ public class Setting : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
-    public void next()
+    private void next()
     {
 
         Time.timeScale = 1;

@@ -15,8 +15,8 @@ public class StageManager : MonoBehaviour
     public int MatchCount;
     public int successH; //쌓아야하는 칸(0부터 시작)
     public int stageNum;
-    public GameObject alpaca;
     public List<Stone> matchQueue = new List<Stone>{ };
+    protected GameObject alpaca;
     protected static StageManager instance = null;
     protected Queue<string> spawnQueue = new Queue<string> { };
     protected Vector2 successPos;
@@ -79,7 +79,41 @@ public class StageManager : MonoBehaviour
         }
     }
 
-    public bool checkSuccess()
+    public void stageReset()
+    {
+        for (int y = 0; y < Map.Instance.height; ++y)
+            for (int x = 0; x < Map.Instance.width; ++x)
+                if (Map.Instance.getStone(new Vector2(x, y)) != null)
+                {
+                    Map.Instance.getStone(new Vector2(x, y)).destroy();
+                }
+        SoundManager.get("main").Stop();
+        Destroy(stoneSet);
+        Destroy(nextStone1);
+        Destroy(nextStone2);
+        matchQueue.Clear();
+        isSuccess = false;
+        transform.position = new Vector3(transform.position.x, 5.5f, transform.position.z);
+        alpaca.GetComponent<Alpaca>().reset();
+        UI.SetActive(true);
+        nextPanel.SetActive(true);
+        UI.transform.Find("Remain").GetComponent<Text>().text = "남은 돌 : ";
+        this.enabled = false;
+    }
+
+    public void doNext()
+    {
+        StartCoroutine("checkMatchsRoutine");
+    }
+
+    public void clicked(string str)
+    {
+        SoundManager.get("touch").Play();
+        if (stoneSet == null) return;
+        stoneSet.GetComponent<StoneSet>().clicked(str);
+    }
+
+    protected bool checkSuccess()
     {
         for (int i = 0; i < Map.Instance.width; i++)
         {
@@ -93,13 +127,13 @@ public class StageManager : MonoBehaviour
         return false;
     }
 
-    public bool checkLoose()
+    protected bool checkLoose()
     {
         return spawnQueue.Count == 0 && next == null && !isSuccess;
     }
-    
 
-    public void spawnNext()
+
+    protected void spawnNext()
     {
         if (checkSuccess())
         {
@@ -127,7 +161,7 @@ public class StageManager : MonoBehaviour
         }
     }
 
-    public bool isAllStop() {
+    protected bool isAllStop() {
         for (int y = 0; y < Map.Instance.height; y++)
         {
             for (int x = 0; x < Map.Instance.width; x++)
@@ -139,7 +173,7 @@ public class StageManager : MonoBehaviour
         return true;
     }
 
-    public void visualizeNext()
+    protected void visualizeNext()
     {
         Destroy(nextStone1);
         Destroy(nextStone2);
@@ -176,19 +210,7 @@ public class StageManager : MonoBehaviour
     }
 
 
-    public void doNext()
-    {
-        StartCoroutine("checkMatchsRoutine");
-    }
-
-    public void clicked(string str) 
-    {
-        SoundManager.get("touch").Play();
-        if (stoneSet == null) return;
-        stoneSet.GetComponent<StoneSet>().clicked(str);
-    }
-
-    public void Loose()
+    protected void Loose()
     {
         loose.SetActive(true);
         SoundManager.get("main").Stop();
@@ -196,7 +218,7 @@ public class StageManager : MonoBehaviour
         //StopCoroutine("checkRoutine");
     }
 
-    public void success(Vector3 successPos)
+    protected void success(Vector3 successPos)
     {
         isSuccess = true;
         Destroy(nextStone1);
@@ -207,7 +229,7 @@ public class StageManager : MonoBehaviour
         nextPanel.SetActive(false);
     }
 
-    public void checkMatchs() {
+    protected void checkMatchs() {
         for (int y = 0; y < successH; y++)
         {
             for (int x = 0; x < Map.Instance.width; x++)
@@ -226,28 +248,7 @@ public class StageManager : MonoBehaviour
         }
         spawnNext();
     }
-
-    public void stageReset()
-    {
-        for (int y = 0; y < Map.Instance.height; ++y)
-            for (int x = 0; x < Map.Instance.width; ++x)
-                if (Map.Instance.getStone(new Vector2(x, y)) != null)
-                {
-                    Map.Instance.getStone(new Vector2(x, y)).destroy();
-                }
-        SoundManager.get("main").Stop();
-        Destroy(stoneSet);
-        Destroy(nextStone1);
-        Destroy(nextStone2);
-        matchQueue.Clear();
-        isSuccess = false;
-        transform.position = new Vector3(transform.position.x, 5.5f, transform.position.z);
-        alpaca.GetComponent<Alpaca>().reset();
-        UI.SetActive(true);
-        nextPanel.SetActive(true);
-        UI.transform.Find("Remain").GetComponent<Text>().text = "남은 돌 : ";
-        this.enabled = false;
-    }
+   
 
     protected IEnumerator checkMatchsRoutine()
     {

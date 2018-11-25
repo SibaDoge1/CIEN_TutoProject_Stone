@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class StoneSet : MonoBehaviour
+public abstract class StoneSet : MonoBehaviour
 {
     protected Transform[] children;
     protected int degree;
@@ -39,7 +39,7 @@ public class StoneSet : MonoBehaviour
         }
     }
 
-    public void fullDown()
+    protected void fullDown()
     {
         while(!isStuckedSet())
         {
@@ -48,7 +48,7 @@ public class StoneSet : MonoBehaviour
         stopMove();
     }
 
-    public virtual void rotate()
+    protected virtual void rotate()
     {
         bool isValid;
         for (int _case = 0; _case < 5; _case++)
@@ -72,13 +72,13 @@ public class StoneSet : MonoBehaviour
         }
     }
 
-    public void resetFall()
+    protected void resetFall()
     {
         StopCoroutine("fall");
         StartCoroutine("fall");
     }
 
-    public bool isValidPosSet(Vector2 vec)
+    protected bool isValidPosSet(Vector2 vec)
     {
         foreach (Transform child in children)
         {
@@ -90,7 +90,7 @@ public class StoneSet : MonoBehaviour
         return true;
     }
 
-    public bool isStuckedSet()
+    protected bool isStuckedSet()
     {
         foreach (Transform child in children)
         {
@@ -102,7 +102,7 @@ public class StoneSet : MonoBehaviour
         return false;
     }
 
-    public void Move(string dir)
+    protected void Move(string dir)
     {
         Vector2 vec = Vector2.zero;
         switch (dir)
@@ -129,7 +129,7 @@ public class StoneSet : MonoBehaviour
         if(dir == "down") resetFall();
     }
 
-    public void firstSet()
+    protected void firstSet()
     {
         foreach (Transform child in children)
         {
@@ -139,7 +139,7 @@ public class StoneSet : MonoBehaviour
             Map.Instance.updateStone(child.transform.GetComponent<Stone>(), Vec2Math.roundVec2(child.transform.position));
         }
     }
-    public void stopMove()
+    protected void stopMove()
     {
         StopCoroutine("fall");
         StageManager.Instance.doNext();
